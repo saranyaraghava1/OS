@@ -1,0 +1,730 @@
+FIFO CPU     #include<iostream>
+using namespace std;
+void findWaitingTime(int processes[], int n,
+int bt[], int wt[])
+
+{
+wt[0] = 0;
+for (int i = 1; i < n ; i++ )
+wt[i] = bt[i-1] + wt[i-1] ;
+}
+void findTurnAroundTime( int processes[], int n,
+int bt[], int wt[], int tat[])
+{
+for (int i = 0; i < n ; i++)
+tat[i] = bt[i] + wt[i];
+}
+void findavgTime( int processes[], int n, int bt[])
+{
+int wt[n], tat[n], total_wt = 0, total_tat = 0;
+findWaitingTime(processes, n, bt, wt);
+findTurnAroundTime(processes, n, bt, wt, tat);
+cout << "Processes "<< " Burst time " << " Waiting time " << " Turn around time\n";
+for (int i=0; i<n; i++)
+{
+total_wt = total_wt + wt[i];
+total_tat = total_tat + tat[i];
+cout << " " << i+1 << "\t\t" << bt[i] <<"\t " << wt[i] <<"\t\t " << tat[i] <<endl;
+}
+cout << "Average waiting time = " << (float)total_wt / (float)n;
+cout << "\nAverage turn around time = " << (float)total_tat / (float)n;
+}
+int main()
+{
+int A,B,C,D,E;
+cout<<"ENTER JOBS"<<endl;
+cin >>A>>B>>C>>D>>E;
+int job[] = { A, B, C, D, E};
+int n = sizeof job / sizeof job[0];
+int B1,B2,B3,B4,B5;
+cout<<"ENTER BURST TIME"<<endl;
+cin>>B1>>B2>>B3>>B4>>B5;
+int burst_time[] = {B1, B2, B3, B4, B5};
+findavgTime(job, n, burst_time);
+return 0;
+}
+//sjf
+#include<iostream>
+using namespace std;
+
+void findWaitingTime(int n, int bt[], int wt[]) {
+    wt[0] = 0;  // Waiting time for the first process is 0
+
+    // Calculate waiting time for the rest of the processes
+    for (int i = 1; i < n; i++) {
+        wt[i] = bt[i - 1] + wt[i - 1];
+    }
+}
+
+void findTurnAroundTime(int n, int bt[], int wt[], int tat[]) {
+    // Calculate turnaround time for each process
+    for (int i = 0; i < n; i++) {
+        tat[i] = bt[i] + wt[i];
+    }
+}
+
+void findavgTime(int n, int bt[]) {
+    int wt[n], tat[n], total_wt = 0, total_tat = 0;
+
+    findWaitingTime(n, bt, wt);
+    findTurnAroundTime(n, bt, wt, tat);
+
+    cout << "Processes " << " Burst time " << " Waiting time " << " Turn around time\n";
+
+    for (int i = 0; i < n; i++) {
+        total_wt += wt[i];
+        total_tat += tat[i];
+        cout << " " << i + 1 << "\t\t" << bt[i] << "\t " << wt[i] << "\t\t " << tat[i] << endl;
+    }
+
+    cout << "Average waiting time = " << (float)total_wt / (float)n << endl;
+    cout << "Average turn around time = " << (float)total_tat / (float)n << endl;
+}
+
+void sjfScheduling(int n, int bt[]) {
+    // Sort the burst time array
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (bt[i] > bt[j]) {
+                swap(bt[i], bt[j]);
+            }
+        }
+    }
+
+    findavgTime(n, bt);
+}
+
+int main() {
+    int n = 6;
+    int burst_time[n];
+
+    cout << "ENTER BURST TIME FOR 5 JOBS:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> burst_time[i];
+    }
+
+    cout << "\nShortest Job First Scheduling:\n";
+    sjfScheduling(n, burst_time);
+
+    return 0;
+}
+//priority
+#include<iostream>
+using namespace std;
+
+// Function to find the waiting time for all processes
+void findWaitingTime(int processes[], int n, int bt[], int wt[], int pr[]) {
+    // Sorting the processes based on priority (higher number means higher priority)
+    for(int i = 0; i < n - 1; i++) {
+        for(int j = 0; j < n - i - 1; j++) {
+            if(pr[j] < pr[j + 1]) {
+                // Swap priorities
+                swap(pr[j], pr[j + 1]);
+                // Swap burst times
+                swap(bt[j], bt[j + 1]);
+                // Swap process numbers
+                swap(processes[j], processes[j + 1]);
+            }
+        }
+    }
+
+    // Waiting time for first process is 0
+    wt[0] = 0;
+
+    // Calculating waiting time
+    for (int i = 1; i < n; i++)
+        wt[i] = bt[i-1] + wt[i-1];
+}
+
+// Function to calculate turn around time
+void findTurnAroundTime(int processes[], int n, int bt[], int wt[], int tat[]) {
+    for (int i = 0; i < n; i++)
+        tat[i] = bt[i] + wt[i];
+}
+
+// Function to calculate average time
+void findavgTime(int processes[], int n, int bt[], int pr[]) {
+    int wt[n], tat[n], total_wt = 0, total_tat = 0;
+
+    // Function to find waiting time of all processes
+    findWaitingTime(processes, n, bt, wt, pr);
+
+    // Function to find turn around time for all processes
+    findTurnAroundTime(processes, n, bt, wt, tat);
+
+    // Display processes along with all details
+    cout << "Processes " << " Burst time " << " Waiting time " << " Turn around time\n";
+
+    // Calculate total waiting time and total turn around time
+    for (int i = 0; i < n; i++) {
+        total_wt = total_wt + wt[i];
+        total_tat = total_tat + tat[i];
+        cout << " " << processes[i] << "\t\t" << bt[i] << "\t " << wt[i] << "\t\t " << tat[i] << endl;
+    }
+
+    cout << "Average waiting time = " << (float)total_wt / (float)n;
+    cout << "\nAverage turn around time = " << (float)total_tat / (float)n;
+}
+
+int main() {
+    int A, B, C, D, E;
+    cout << "ENTER JOBS\n";
+    cin >> A >> B >> C >> D >> E;
+    int job[] = { A, B, C, D, E };
+    int n = sizeof job / sizeof job[0];
+
+    int B1, B2, B3, B4, B5;
+    cout << "ENTER BURST TIME\n";
+    cin >> B1 >> B2 >> B3 >> B4 >> B5;
+    int burst_time[] = { B1, B2, B3, B4, B5 };
+
+    int P1, P2, P3, P4, P5;
+    cout << "ENTER PRIORITIES\n";
+    cin >> P1 >> P2 >> P3 >> P4 >> P5;
+    int priority[] = { P1, P2, P3, P4, P5 };
+
+    findavgTime(job, n, burst_time, priority);
+    return 0;
+}
+//disk fifo
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+int main() {
+    int queue[100], q_size, head, seek = 0, diff;
+    float avg;
+
+    cout << "DISK SCHEDULING (FCFS)\n\n";
+    cout << "Enter the size of the queue: ";
+    cin >> q_size;
+
+    cout << "Enter queue elements:\n";
+    for(int i = 1; i <= q_size; i++) {
+        cin >> queue[i];
+    }
+
+    cout << "Enter initial head position: ";
+    cin >> head;
+
+    queue[0] = head;
+
+    for(int j = 0; j < q_size; j++) {
+        diff = abs(queue[j] - queue[j + 1]);
+        seek += diff;
+    }
+
+    cout << "\nNumber of cylinders are " << seek << "\t";
+
+    return 0;
+}
+//system calls
+#include <iostream>
+#include <unistd.h>
+#include <cstdlib>
+
+using namespace std;
+
+int main() {
+    int pid;
+    pid = fork();
+
+    if (pid < 0) {
+        cout << "The fork cannot be created" << endl;
+        exit(1);
+    } else if (pid == 0) {
+        execlp("ls", "ls", NULL);
+        // If execlp fails, the following lines will be executed
+        cout << "\nThe process id of the child: " << getpid() << endl;
+        cout << "\nThe process id of the parent: " << getppid() << endl;
+    } else {
+        cout << "\nThe process id of the parent: " << getpid() << endl;
+        cout << "\nThe process id of the grandparent: " << getppid() << endl;
+    }
+
+    return 0;
+}
+//fifo page
+#include <iostream>
+using namespace std;
+
+int main() {
+    int i, j, n, no, k, avail, count = 0;
+    int a[50], frame[10];
+
+    cout << "_FIFO PAGE REPLACEMENT ALGORITHM:" << endl;
+    cout << "\nENTER THE NUMBER OF PAGES: ";
+    cin >> n;
+
+    cout << "\nENTER THE PAGE NUMBER: " << endl;
+    for (i = 1; i <= n; i++)
+        cin >> a[i];
+
+    cout << "\nENTER THE NUMBER OF FRAMES: ";
+    cin >> no;
+
+    for (i = 0; i < no; i++)
+        frame[i] = -1;
+
+    j = 0;
+    cout << "Reg page\tFrames" << endl;
+
+    for (i = 1; i <= n; i++) {
+        cout << a[i] << "\t\t";
+        avail = 0;
+
+        for (k = 0; k < no; k++)
+            if (frame[k] == a[i])
+                avail = 1;
+
+        if (avail == 0) {
+            frame[j] = a[i];
+            j = (j + 1) % no;
+            count++;
+
+            for (k = 0; k < no; k++)
+                cout << frame[k] << "\t";
+        }
+
+        cout << endl;
+    }
+
+    cout << "\nTotal number of Page Faults is " << count << endl;
+
+    return 0;
+}
+//stat
+#include <iostream>
+#include <sys/stat.h>
+#include <cstdlib>
+
+int main() {
+    struct stat s;
+    int a, b;
+
+    if (stat("suba", &s) == -1) {
+        perror("Error: cannot stat file");
+        exit(EXIT_FAILURE);
+    }
+
+    a = s.st_blksize;
+    b = s.st_size;
+
+    std::cout << "ALLOCATED SIZE OF THE FILE: " << a << std::endl;
+    std::cout << "Actual size of the file: " << b << std::endl;
+
+    return 0;
+}
+//producer consumer
+#include <iostream>
+using namespace std;
+int count = 0;
+int front = 0;
+int rear = 0;
+char buffer[25];
+int p_p = 0;
+int c_p = 0;
+void producer(int n) {
+    char item;
+    if (count < n) {
+        cout << "Enter data: ";
+        cin >> item;
+        buffer[front] = item;
+        front = (front + 1) % 5;
+        count++;
+        if (c_p == 1 && count == 1) {
+            cout << "\nConsumer is now ready" << endl;
+        }
+    } else {
+        cout << "\nBuffer is full..." << endl;
+        p_p = 1;
+    }
+}
+
+void consumer(int n) {
+    char item;
+    if (count > 0) {
+        item = buffer[rear];
+        buffer[rear] = ' ';
+        cout << "\nC: " << item;
+        rear = (rear + 1) % 5;
+        count--;
+        if (p_p == 1 && count == 4) {
+            cout << "\nProducer is now ready" << endl;
+        }
+    } else {
+        cout << "\nBuffer is empty..." << endl;
+        c_p = 1;
+    }
+}
+
+void view(int n) {
+    cout << "\nData of buffer: ";
+    for (int i = 0; i < n; i++) {
+        cout << "- " << buffer[i] << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    int n, ch, f = 0;
+    cout << "ENTER THE COUNT FOR THE BUFFER: ";
+    cin >> n;
+    cout << "\noptions";
+    cout << "\n1: Producer item";
+    cout << "\n2: Consumer item";
+    cout << "\n3: To view buffer";
+    cout << "\n4: Exit" << endl;
+
+    do {
+        cout << "\nEnter your choice: ";
+        cin >> ch;
+        switch (ch) {
+            case 1:
+                producer(n);
+                break;
+            case 2:
+                consumer(n);
+                break;
+            case 3:
+                view(n);
+                break;
+            case 4:
+                f = 1;
+                break;
+            default:
+                cout << "\nEnter correct choice" << endl;
+                break;
+        }
+    } while (f == 0);
+
+    return 0;
+}
+//bankers
+#include <bits/stdc++.h> 
+using namespace std;
+
+int main() { 
+    int i, j, k; 
+    int n = 5; //number of processes 
+    int m = 3; //number of resources 
+    int allocation[5][3] = {{0, 1, 0},   //Allocation Matrix 
+                        {2, 0, 0},  
+                        {3, 0, 2},  
+                        {2, 1, 1},  
+                        {0, 0, 2}}; //Each row represents a process 
+  
+    int max[5][3] = {{7, 5, 3}, //MAX Matrix 
+                      {3, 2, 2}, 
+                      {9, 0, 2}, 
+                      {2, 2, 2}, 
+                      {4, 3, 3}}; //Maximum resources that can be allocated 
+  
+    int available[3] = {3, 3, 2}; //Available resources at start 
+  
+    int finish[n] = {0};
+    int ans[n] = {0};
+    int idx =  0; 
+    
+    int need[n][m];  //Calculating Need matrix
+    for(int i=0;i<n;i++)
+    { 
+        for(int j=0;j<m; j++)
+        {
+            need[i][j] = max[i][j] - allocation[i][j];
+        } 
+    } 
+    
+    int y = 0; 
+    for (int k=0;k<5;k++) 
+    { 
+        for(int i=0;i<n;i++)
+        { 
+            if(finish[i]==0)
+            { 
+                int flag = 0; 
+                for(int j=0;j<m;j++)
+                { 
+                    if(need[i][j]>available[j])
+                    { 
+                        flag = 1; //if needed resources are more in number than the available ones, move to the next process
+                        break; 
+                    }
+                } 
+                
+                if(flag==0)
+                {  //if available resources fulfilled the need
+                    ans[idx++] = i; //the index of process, that has been allocated the resources
+                    for(int y=0;y<m;y++)
+                    { 
+                        available[y] += allocation[i][y]; 
+                    }
+                    finish[i] = 1; 
+                } 
+            } 
+        } 
+    } 
+    
+    bool flag = true;
+    for(int i=0; i<n; i++)
+    {
+        if(finish[i] == 0)
+        { 
+            flag = false; 
+            cout<<"System is in deadlock !!"; break; 
+        }
+    }
+    
+    if(flag==true)
+    {
+        cout<<"System is in safe state and following is the safe sequence: ";
+        for(int i=0;i<n-1;i++)
+        {
+            cout<<"P"<<ans[i]<<" -> "; 
+        }
+        cout<<"P"<<ans[n-1]<<endl;
+    }  
+    return 0; 
+} 
+//file directory or not
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main()
+{
+    // creating an ifstream object named file
+    ifstream file;
+
+    // opening the file
+    file.open("test.txt");
+
+    // checking if the file opening was successful, it will only be true ie. file would have been opened, only if the file exists, so indirectly we are checking if the file exists or not by opening it, if opened, then the file exists, else does not exists
+    if (file)
+    {
+        // printing the success message
+        cout << "File exists" << endl;
+    }
+    else
+    {
+        // printing the error message
+        cout << "File does not exists" << endl;
+    }
+
+    return 0;
+}
+//copy edit rename
+#include <iostream>
+#include <fstream>
+#include <cstdio> // For renaming files
+
+using namespace std;
+
+int main() {
+    int choice;
+    char sourceFileName[100], destFileName[100];
+
+    cout << "File Operations Menu" << endl;
+    cout << "1. Copy a file" << endl;
+    cout << "2. Edit a file" << endl;
+    cout << "3. Rename a file" << endl;
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    switch (choice) {
+        case 1: {
+            ifstream sourceFile;
+            ofstream destFile;
+
+            cout << "Enter source file name: ";
+            cin >> sourceFileName;
+            cout << "Enter destination file name: ";
+            cin >> destFileName;
+
+            sourceFile.open(sourceFileName, ios::binary);
+            destFile.open(destFileName, ios::binary);
+
+            if (!sourceFile || !destFile) {
+                cerr << "Failed to open files for copying." << endl;
+                return 1;
+            }
+
+            destFile << sourceFile.rdbuf();
+
+            cout << "File copied successfully." << endl;
+
+            sourceFile.close();
+            destFile.close();
+            break;
+        }
+        case 2: {
+            ofstream file;
+
+            cout << "Enter file name to edit: ";
+            cin >> sourceFileName;
+
+            file.open(sourceFileName);
+
+            if (!file) {
+                cerr << "Failed to open file for editing." << endl;
+                return 1;
+            }
+
+            cout << "Enter text to write to the file. Enter 'EOF' on a new line to finish editing." << endl;
+            string line;
+            while (getline(cin, line) && line != "EOF") {
+                file << line << endl;
+            }
+
+            cout << "File edited successfully." << endl;
+
+            file.close();
+            break;
+        }
+        case 3: {
+            cout << "Enter old file name: ";
+            cin >> sourceFileName;
+            cout << "Enter new file name: ";
+            cin >> destFileName;
+
+            if (rename(sourceFileName, destFileName) != 0) {
+                cerr << "Failed to rename file." << endl;
+                return 1;
+            }
+
+            cout << "File renamed successfully." << endl;
+            break;
+        }
+        default:
+            cout << "Invalid choice." << endl;
+            break;
+    }
+
+    return 0;
+}
+//file operations
+#!/bin/bash
+
+while true; do
+    # Display menu options
+    echo "File Operations Menu"
+    echo "1. Create a file"
+    echo "2. Read a file"
+    echo "3. Write to a file"
+    echo "4. Delete a file"
+    echo "5. Exit"
+    
+    # Prompt user for choice
+    read -p "Enter your choice: " choice
+    
+    case $choice in
+        1)
+            # Create a file
+            read -p "Enter file name: " filename
+            touch $filename
+            echo "File '$filename' created successfully."
+            ;;
+        2)
+            # Read a file
+            read -p "Enter file name to read: " filename
+            if [ -f $filename ]; then
+                echo "Contents of file '$filename':"
+                cat $filename
+            else
+                echo "File '$filename' does not exist."
+            fi
+            ;;
+        3)
+            # Write to a file
+            read -p "Enter file name to write to: " filename
+            if [ -f $filename ]; then
+                echo "Enter text to write to '$filename' (press Ctrl+D to save):"
+                cat >> $filename
+                echo "Text written to file '$filename' successfully."
+            else
+                echo "File '$filename' does not exist."
+            fi
+            ;;
+        4)
+            # Delete a file
+            read -p "Enter file name to delete: " filename
+            if [ -f $filename ]; then
+                rm $filename
+                echo "File '$filename' deleted successfully."
+            else
+                echo "File '$filename' does not exist."
+            fi
+            ;;
+        5)
+            # Exit the script
+            echo "Exiting program. Goodbye!"
+            exit
+            ;;
+        *)
+            # Invalid choice
+            echo "Invalid choice. Please enter a valid option."
+            ;;
+    esac
+done
+//shell programming
+read n
+fact=1
+for((i=1;i<=n;i++))
+do
+fact=$( expr $fact \* $i )
+done
+echo The factorial of $n is $fact
+----------------------------------
+read n
+a=0
+b=1
+echo "The Fibonacci series is : "
+  
+for((i=0;i<n;i++))
+do
+echo -n "$a "
+f=$((a+b))
+a=$b
+b=$f
+done
+---------------------------------
+read a b c
+if [ $a -gt $b -a $a -gt $c ]
+then
+echo "$a is Greatest"
+elif [ $b -gt $c -a $b -gt $a ]
+then
+echo "$b is Greatest"
+else
+echo "$c is Greatest!"
+fi
+----------------------------------
+read n
+a=expr $n % 2
+if [ $a -eq 0 ]
+then
+echo $n is even
+else
+echo $n is odd
+fi
+--------------------------------
+read n
+a=expr $n % 4
+if [ $a -eq 0 ]
+then
+echo $n is leap year
+else
+echo $n is not a leap year
+fi
+------------------------------------
+read n
+i=$n
+sum=0
+while [ $n -gt 0 ]
+do 
+digit=$(( n%10 ))
+sum=$(( sum+$digit ))
+n=$(( n/10 ))
+done
+echo "the sum of $i is $sum"
